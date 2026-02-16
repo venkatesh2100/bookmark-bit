@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Bookmark App
 
-## Getting Started
+A real-time bookmark manager built with Next.js, Supabase, and Tailwind CSS.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 🔐 Google OAuth authentication (no email/password)
+- ➕ Add bookmarks with URL and title
+- 🔒 Private bookmarks per user (Row Level Security)
+- ⚡ Real-time updates across tabs (Supabase Realtime)
+- 🗑️ Delete bookmarks
+- 🚀 Deployed on Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Next.js 16** (App Router)
+- **Supabase** (Auth, Database, Realtime)
+- **Tailwind CSS** (Styling)
+- **TypeScript**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup
 
-## Learn More
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Set up Supabase:**
+   - Create a new project at [supabase.com](https://supabase.com)
+   - Go to SQL Editor and run the schema from `supabase-schema.sql`
+   - Enable Google OAuth in Authentication > Providers
+   - Add your Google OAuth credentials
+   - Get your project URL and anon key from Settings > API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configure environment variables:**
+   Create a `.env.local` file:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open [http://localhost:3000](http://localhost:3000)**
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your code to GitHub
+2. Import the project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Update Supabase OAuth redirect URL to include your Vercel domain
+5. Deploy!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+├── app/
+│   ├── api/
+│   │   ├── auth/callback/    # OAuth callback handler
+│   │   └── bookmarks/        # Bookmark API routes
+│   ├── auth/login/           # Login page
+│   ├── dashboard/            # Main dashboard
+│   └── layout.tsx
+├── components/
+│   ├── BookmarkForm.tsx      # Add bookmark form
+│   ├── BookmarkList.tsx      # Real-time bookmark list
+│   └── LogoutButton.tsx
+├── lib/
+│   ├── auth.ts               # Auth utilities
+│   ├── supabase/             # Supabase clients
+│   └── types.ts              # TypeScript types
+└── supabase-schema.sql       # Database schema
+```
