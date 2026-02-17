@@ -53,3 +53,4 @@ Once verified redirects to the Login page.
 4.Creating Supabse channel websocket to listen live updates of INSERT , DELETE , UPDATE.
 
 Initial fectch using APIS and after that  a live websocket listens the operations in supabase and updates the States of Bookmarks!
+![alt text](image-3.png)

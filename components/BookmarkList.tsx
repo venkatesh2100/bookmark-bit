@@ -8,70 +8,81 @@ export default function BookmarkList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let channel: ReturnType<typeof supabase.channel> | null = null
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
     const fetchBookmarks = async (isInitialLoad = false) => {
-      const res = await fetch('/api/bookmarks')
+      const res = await fetch("/api/bookmarks");
       if (res.ok) {
-        const data = await res.json()
-        setBookmarks(data)
+        const data = await res.json();
+        setBookmarks(data);
       } else {
-        console.error('Error fetching bookmarks')
+        console.error("Error fetching bookmarks");
       }
       if (isInitialLoad) {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     const setupRealtime = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
 
-      await fetchBookmarks(true)
+      await fetchBookmarks(true);
 
       channel = supabase
         .channel(`bookmarks-realtime-${user.id}`)
         .on(
-          'postgres_changes',
+          "postgres_changes",
           {
-            event: '*',
-            schema: 'public',
-            table: 'bookmarks',
+            event: "*",
+            schema: "public",
+            table: "bookmarks",
           },
           (payload) => {
-            console.log(' Realtime event received:', payload.eventType, payload)
+            console.log(
+              " Realtime event received:",
+              payload.eventType,
+              payload
+            );
 
             // Check if this event is for the current user
-            const newRecord = payload.new as { user_id?: string } | null
-            const oldRecord = payload.old as { user_id?: string } | null
-            const recordUserId = newRecord?.user_id || oldRecord?.user_id
+            const newRecord = payload.new as { user_id?: string } | null;
+            const oldRecord = payload.old as { user_id?: string } | null;
+            const recordUserId = newRecord?.user_id || oldRecord?.user_id;
             if (recordUserId !== user.id) {
-              console.log('⏭Event is for different user, ignoring')
-              return
+              console.log("⏭Event is for different user, ignoring");
+              return;
             }
 
-            if (payload.eventType === 'DELETE') {
-              fetchBookmarks(false)
-            } else if (payload.eventType === 'INSERT') {
-              fetchBookmarks(false)
-            } else if (payload.eventType === 'UPDATE') {
-              fetchBookmarks(false)
+            if (payload.eventType === "DELETE") {
+              fetchBookmarks(false);
+            } else if (payload.eventType === "INSERT") {
+              fetchBookmarks(false);
+            } else if (payload.eventType === "UPDATE") {
+              fetchBookmarks(false);
             }
           }
         )
-    }
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            console.log(" Realtime subscription active");
+          }
+        });
+    };
 
-    setupRealtime()
+    setupRealtime();
 
     return () => {
       if (channel) {
-        supabase.removeChannel(channel)
+        supabase.removeChannel(channel);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this bookmark?")) return;
@@ -79,11 +90,10 @@ export default function BookmarkList() {
     try {
       const res = await fetch(`/api/bookmarks/${id}`, { method: "DELETE" });
       if (res.ok) {
-
         setTimeout(() => {
           console.log(" Real-time update timeout, updating UI directly");
           setBookmarks((prev) => prev.filter((b) => b.id !== id));
-        }, 1000);
+        }, 100);
       } else {
         const res = await fetch("/api/bookmarks");
         if (res.ok) {
@@ -96,7 +106,12 @@ export default function BookmarkList() {
     }
   };
 
-  if (loading) return <div className="text-center flex items-center w-full  justify-center">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center flex items-center w-full  justify-center">
+        Loading...
+      </div>
+    );
 
   if (bookmarks.length === 0) {
     return (
