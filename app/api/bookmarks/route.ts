@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const user = await requireAuth()
     const supabase = await createServerSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('bookmarks')
       .select('*')
@@ -15,8 +15,8 @@ export async function GET() {
 
     if (error) throw error
     return NextResponse.json(data)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error }, { status: 500 })
   }
 }
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     if (error) throw error
     return NextResponse.json(data)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error:unknown) {
+    return NextResponse.json({ error: error }, { status: 500 })
   }
 }

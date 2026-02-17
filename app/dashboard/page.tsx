@@ -9,7 +9,7 @@ export default async function Dashboard() {
   return (
     <div className="min-h-screen p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Bookmarks</h1>
+        <h1 className="text-2xl mask-radial-from-neutral-700 ">My Bookmarks</h1>
         <LogoutButton />
       </div>
       <BookmarkForm />
@@ -17,4 +17,3 @@ export default async function Dashboard() {
     </div>
   )
 }
-

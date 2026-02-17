@@ -36,7 +36,7 @@ export default function BookmarkForm() {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded"
+          className="flex-1 px-3 py-2 border rounded-md border-gray-300"
           required
         />
         <input
@@ -44,13 +44,13 @@ export default function BookmarkForm() {
           placeholder="URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded"
+          className="flex-1 px-3 py-2 border -md border-gray-300"
           required
         />
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2  text-gray-700 border border-gray-300  rounded shadow-md disabled:opacity-50"
         >
           Add
         </button>
@@ -58,5 +58,3 @@ export default function BookmarkForm() {
     </form>
   )
 }
-
-

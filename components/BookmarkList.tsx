@@ -1,11 +1,11 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
-import type { Bookmark } from '@/lib/types'
+"use client";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
+import type { Bookmark } from "@/lib/types";
 
 export default function BookmarkList() {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
-  const [loading, setLoading] = useState(true)
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null
@@ -30,11 +30,8 @@ export default function BookmarkList() {
         return
       }
 
-      // Fetch initial bookmarks from API
       await fetchBookmarks(true)
 
-      // Set up real-time subscription that triggers refetch on changes
-      // Note: We don't use filter for DELETE events as they may not work properly with filters
       channel = supabase
         .channel(`bookmarks-realtime-${user.id}`)
         .on(
@@ -45,38 +42,26 @@ export default function BookmarkList() {
             table: 'bookmarks',
           },
           (payload) => {
-            console.log('🔔 Realtime event received:', payload.eventType, payload)
-            
+            console.log(' Realtime event received:', payload.eventType, payload)
+
             // Check if this event is for the current user
             const newRecord = payload.new as { user_id?: string } | null
             const oldRecord = payload.old as { user_id?: string } | null
             const recordUserId = newRecord?.user_id || oldRecord?.user_id
             if (recordUserId !== user.id) {
-              console.log('⏭️ Event is for different user, ignoring')
+              console.log('⏭Event is for different user, ignoring')
               return
             }
-            
-            // Handle DELETE events explicitly
+
             if (payload.eventType === 'DELETE') {
-              console.log('🗑️ Delete event detected for user:', payload.old)
-              // For DELETE, refetch immediately (no delay needed)
               fetchBookmarks(false)
             } else if (payload.eventType === 'INSERT') {
-              console.log('➕ Insert event detected')
-              // For INSERT, refetch immediately
               fetchBookmarks(false)
             } else if (payload.eventType === 'UPDATE') {
-              console.log('✏️ Update event detected')
-              // For UPDATE, refetch immediately
               fetchBookmarks(false)
             }
           }
         )
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            console.log('✅ Realtime subscription active')
-          }
-        })
     }
 
     setupRealtime()
@@ -89,45 +74,43 @@ export default function BookmarkList() {
   }, [])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this bookmark?')) return
-    
+    if (!confirm("Delete this bookmark?")) return;
+
     try {
-      const res = await fetch(`/api/bookmarks/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/bookmarks/${id}`, { method: "DELETE" });
       if (res.ok) {
-        console.log('✅ Delete request successful, waiting for real-time update...')
-        
-        // Fallback: If real-time doesn't update within 1 second, update UI directly
+
         setTimeout(() => {
-          console.log('⏰ Real-time update timeout, updating UI directly')
-          setBookmarks((prev) => prev.filter((b) => b.id !== id))
-        }, 5000)
-        
-        // Note: Real-time subscription should trigger fetchBookmarks which will update state
-        // This fallback ensures UI updates even if real-time is delayed
+          console.log(" Real-time update timeout, updating UI directly");
+          setBookmarks((prev) => prev.filter((b) => b.id !== id));
+        }, 1000);
       } else {
-        console.error('Failed to delete bookmark')
-        // If delete fails, refetch to get current state
-        const res = await fetch('/api/bookmarks')
+        const res = await fetch("/api/bookmarks");
         if (res.ok) {
-          const data = await res.json()
-          setBookmarks(data)
+          const data = await res.json();
+          setBookmarks(data);
         }
       }
     } catch (error) {
-      console.error('Error deleting bookmark:', error)
+      console.error("Error deleting bookmark:", error);
     }
-  }
+  };
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <div className="text-center flex items-center w-full  justify-center">Loading...</div>;
 
   if (bookmarks.length === 0) {
-    return <div className="text-gray-500">No bookmarks yet. Add one above!</div>
+    return (
+      <div className="text-gray-500">No bookmarks yet. Add one above!</div>
+    );
   }
 
   return (
     <ul className="space-y-2">
       {bookmarks.map((bookmark) => (
-        <li key={bookmark.id} className="flex items-center justify-between p-3 border rounded">
+        <li
+          key={bookmark.id}
+          className="flex items-center justify-between p-3 shadow-md border border-gray-300 rounded-md"
+        >
           <div className="flex-1">
             <a
               href={bookmark.url}
@@ -151,6 +134,5 @@ export default function BookmarkList() {
         </li>
       ))}
     </ul>
-  )
+  );
 }
-
